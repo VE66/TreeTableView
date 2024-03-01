@@ -65,7 +65,7 @@ class ViewController: UIViewController {
             let dict = try? JSONSerialization.jsonObject(with: data as Data) as? [Any]
             if let model = [ListModel].deserialize(from: dict) as? [ListModel] {
                 let mgr = ZListModelManager.init(listModels: model)
-                let vc = ZLTableViewController()
+                let vc = ZLTreeViewController()
                 vc.modelManager = mgr
                 self.navigationController?.pushViewController(vc, animated: true)
             }

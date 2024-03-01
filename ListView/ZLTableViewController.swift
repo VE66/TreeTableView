@@ -10,34 +10,44 @@ import UIKit
 class ZLTableViewController: UITableViewController {
     
     var modelManager: ZListModelManager?
-    
+    private var levelMax: [String: CGFloat] = [:]
     private var selectItems: Set<String> = Set<String>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: NSStringFromClass(UITableViewCell.self))
+        self.tableView.register(TableViewTreeCell.self, forCellReuseIdentifier: NSStringFromClass(TableViewTreeCell.self))
+        self.tableView.estimatedRowHeight = 48
+        self.tableView.rowHeight = UITableView.automaticDimension
         title = "title"
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-//        let listModel = modelManager?.listModels[section]
-        
         return modelManager?.listModels.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(UITableViewCell.self), for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(TableViewTreeCell.self), for: indexPath) as! TableViewTreeCell
         
         let model = modelManager!.listModels[indexPath.row]
-        cell.textLabel?.text = model.text 
-        
+        let level = Int(model.level) ?? 0
+        cell.indentationLevel = level
+        cell.exceedWidth = { [weak self] width in
+            self?.exceedTableViewWidth(width)
+        }
+        cell.setData(title: model.text, avater: nil, showMore: model.showMore, level: level, showUnbind: true)
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, indentationLevelForRowAt indexPath: IndexPath) -> Int {
-        let model = modelManager?.listModels[indexPath.row]
-        return Int(model?.level ?? "0") ?? 0
+    func exceedTableViewWidth(_ width: CGFloat) {
+        var contentSize = tableView.contentSize
+        if width > contentSize.width {
+            contentSize.width = width
+        } else {
+            if width < self.view.bounds.width {
+                contentSize.width = self.view.bounds.width
+            }
+        }
+        tableView.contentSize = contentSize
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -45,6 +55,7 @@ class ZLTableViewController: UITableViewController {
             let didSelectModel = manager.listModels[indexPath.row]
             if didSelectModel.belowCount == 0 {
                 if let submodels = didSelectModel.openModel() {
+                    tableView.reloadRows(at: [indexPath], with: .none)
                     manager.listModels.insert(contentsOf: submodels, at: indexPath.row + 1)
                     var indexPaths: [IndexPath] = []
                     for (i, _) in submodels.enumerated() {
@@ -59,6 +70,7 @@ class ZLTableViewController: UITableViewController {
                 let range = (indexPath.row + 1)..<(didSelectModel.belowCount+indexPath.row + 1)
                 let submodels = Array(manager.listModels[range])
                 didSelectModel.closeWithSubmodels(submodels)
+                tableView.reloadRows(at: [indexPath], with: .none)
                 manager.listModels.removeSubrange(range)
                 var indexPaths: [IndexPath] = []
                 for (i, _) in submodels.enumerated() {
