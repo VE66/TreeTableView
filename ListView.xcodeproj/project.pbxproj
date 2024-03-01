@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D2D8CF92B91B28F0028BE07 /* ZLTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D2D8CF82B91B28F0028BE07 /* ZLTreeView.swift */; };
 		3D8686A82B8DE1FA00C28048 /* ZListModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8686A72B8DE1FA00C28048 /* ZListModelManager.swift */; };
 		3D8686AA2B8DE38000C28048 /* model.text in Resources */ = {isa = PBXBuildFile; fileRef = 3D8686A92B8DE38000C28048 /* model.text */; };
 		3D8686AC2B8EC6CD00C28048 /* ZLTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8686AB2B8EC6CD00C28048 /* ZLTableViewController.swift */; };
@@ -17,12 +18,13 @@
 		3DD756602B43FE8900C816DA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DD7565E2B43FE8900C816DA /* Main.storyboard */; };
 		3DD756622B43FE8B00C816DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DD756612B43FE8B00C816DA /* Assets.xcassets */; };
 		3DD756652B43FE8B00C816DA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DD756632B43FE8B00C816DA /* LaunchScreen.storyboard */; };
-		3DDDD4372B905818008BA391 /* TableViewTreeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDDD4362B905818008BA391 /* TableViewTreeCell.swift */; };
+		3DDDD4372B905818008BA391 /* ZlTableViewTreeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDDD4362B905818008BA391 /* ZlTableViewTreeCell.swift */; };
 		BC5B14B504CF74E7F41821FC /* Pods_ListView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92CF9B7104CDE88B59FC323A /* Pods_ListView.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		06AA4D71DEE7307F268FB5DF /* Pods-ListView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ListView.release.xcconfig"; path = "Target Support Files/Pods-ListView/Pods-ListView.release.xcconfig"; sourceTree = "<group>"; };
+		3D2D8CF82B91B28F0028BE07 /* ZLTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZLTreeView.swift; sourceTree = "<group>"; };
 		3D8686A72B8DE1FA00C28048 /* ZListModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZListModelManager.swift; sourceTree = "<group>"; };
 		3D8686A92B8DE38000C28048 /* model.text */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = model.text; sourceTree = "<group>"; };
 		3D8686AB2B8EC6CD00C28048 /* ZLTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZLTableViewController.swift; sourceTree = "<group>"; };
@@ -35,7 +37,7 @@
 		3DD756612B43FE8B00C816DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3DD756642B43FE8B00C816DA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3DD756662B43FE8B00C816DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3DDDD4362B905818008BA391 /* TableViewTreeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewTreeCell.swift; sourceTree = "<group>"; };
+		3DDDD4362B905818008BA391 /* ZlTableViewTreeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZlTableViewTreeCell.swift; sourceTree = "<group>"; };
 		6E26549A92E5839F757D9784 /* Pods-ListView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ListView.debug.xcconfig"; path = "Target Support Files/Pods-ListView/Pods-ListView.debug.xcconfig"; sourceTree = "<group>"; };
 		92CF9B7104CDE88B59FC323A /* Pods_ListView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ListView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -79,7 +81,8 @@
 				3D8686A72B8DE1FA00C28048 /* ZListModelManager.swift */,
 				3D8686AB2B8EC6CD00C28048 /* ZLTableViewController.swift */,
 				3DC5B0302B9073540033C9DA /* ZLTreeViewController.swift */,
-				3DDDD4362B905818008BA391 /* TableViewTreeCell.swift */,
+				3D2D8CF82B91B28F0028BE07 /* ZLTreeView.swift */,
+				3DDDD4362B905818008BA391 /* ZlTableViewTreeCell.swift */,
 				3D8686A92B8DE38000C28048 /* model.text */,
 				3DD7565E2B43FE8900C816DA /* Main.storyboard */,
 				3DD756612B43FE8B00C816DA /* Assets.xcassets */,
@@ -226,7 +229,8 @@
 				3D8686A82B8DE1FA00C28048 /* ZListModelManager.swift in Sources */,
 				3DD7565D2B43FE8900C816DA /* ViewController.swift in Sources */,
 				3DD756592B43FE8900C816DA /* AppDelegate.swift in Sources */,
-				3DDDD4372B905818008BA391 /* TableViewTreeCell.swift in Sources */,
+				3D2D8CF92B91B28F0028BE07 /* ZLTreeView.swift in Sources */,
+				3DDDD4372B905818008BA391 /* ZlTableViewTreeCell.swift in Sources */,
 				3D8686AC2B8EC6CD00C28048 /* ZLTableViewController.swift in Sources */,
 				3DD7565B2B43FE8900C816DA /* SceneDelegate.swift in Sources */,
 			);

@@ -15,7 +15,7 @@ class ZLTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.register(TableViewTreeCell.self, forCellReuseIdentifier: NSStringFromClass(TableViewTreeCell.self))
+        self.tableView.register(ZlTableViewTreeCell.self, forCellReuseIdentifier: NSStringFromClass(ZlTableViewTreeCell.self))
         self.tableView.estimatedRowHeight = 48
         self.tableView.rowHeight = UITableView.automaticDimension
         title = "title"
@@ -26,14 +26,12 @@ class ZLTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(TableViewTreeCell.self), for: indexPath) as! TableViewTreeCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(ZlTableViewTreeCell.self), for: indexPath) as! ZlTableViewTreeCell
         
         let model = modelManager!.listModels[indexPath.row]
         let level = Int(model.level) ?? 0
         cell.indentationLevel = level
-        cell.exceedWidth = { [weak self] width in
-            self?.exceedTableViewWidth(width)
-        }
+    
         cell.setData(title: model.text, avater: nil, showMore: model.showMore, level: level, showUnbind: true)
         return cell
     }

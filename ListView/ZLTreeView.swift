@@ -1,15 +1,18 @@
 //
-//  ZLTreeViewController.swift
+//  ZLTreeView.swift
 //  ListView
 //
-//  Created by zcz on 2024/2/29.
+//  Created by ZCZ on 2024/3/1.
 //
 
 import UIKit
 
-class ZLTreeViewController: UIViewController {
-    
-    var modelManager: ZListModelManager?
+class ZLTreeView: UIView {
+    var modelManager: ZListModelManager? {
+        didSet {
+            self.tbView.reloadData()
+        }
+    }
     private var levelMax: [String: CGFloat] = [:]
     private var selectItems: Set<String> = Set<String>()
 
@@ -25,33 +28,36 @@ class ZLTreeViewController: UIViewController {
         return tb
     }()
     
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let treeView = ZLTreeView()
-        treeView.modelManager = self.modelManager
-        self.view.addSubview(treeView)
-        treeView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        print("sssssssssssss")
+        setupUI()
+    }
+    
+    func setupUI() {
+        self.addSubview(tbView)
+        tbView.snp.makeConstraints { make in
+            make.edges.equalTo(self)
         }
-//        self.view.addSubview(scrView)
-//        scrView.snp.makeConstraints { make in
-//            make.width.equalTo(self.view.bounds.width)
-//            make.height.equalToSuperview()
-//            make.top.bottom.equalToSuperview()
-//        }
-//        self.view.addSubview(tbView)
-//        tbView.snp.makeConstraints { make in
-//            make.left.right.bottom.equalTo(self.view)
-//            make.top.equalTo(self.view.frame.origin.y)
-//        }
     }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    /*
+    // Only override draw() if you perform custom drawing.
+    // An empty implementation adversely affects performance during animation.
+    override func draw(_ rect: CGRect) {
+        // Drawing code
+    }
+    */
 
 }
 
-extension ZLTreeViewController: UITableViewDelegate, UITableViewDataSource {
+extension ZLTreeView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return modelManager?.listModels.count ?? 0
     }
@@ -103,7 +109,7 @@ extension ZLTreeViewController: UITableViewDelegate, UITableViewDataSource {
 
 }
 
-extension ZLTreeViewController: ZLTableViewTreeCellProtocol {
+extension ZLTreeView: ZLTableViewTreeCellProtocol {
     func pancell(_ cell: UITableViewCell, oringX: CGFloat) {
         if let indexPath = self.tbView.indexPath(for: cell), indexPath.row > 0 {
             for i in (0..<indexPath.row).reversed() {

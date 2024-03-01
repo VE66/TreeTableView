@@ -1,5 +1,5 @@
 //
-//  TableViewTreeCell.swift
+//  ZlTableViewTreeCell.swift
 //  ListView
 //
 //  Created by zcz on 2024/2/29.
@@ -7,15 +7,14 @@
 
 import UIKit
 
-protocol TableViewTreeCellProtocol: AnyObject {
+protocol ZLTableViewTreeCellProtocol: AnyObject {
     func pancell(_ cell: UITableViewCell, oringX: CGFloat)
     func unbindAction(_ cell: UITableViewCell)
 }
 
-class TableViewTreeCell: UITableViewCell {
+class ZlTableViewTreeCell: UITableViewCell {
     
-    var exceedWidth: ((CGFloat) -> Void)?
-    weak var delegate: TableViewTreeCellProtocol?
+    weak var delegate: ZLTableViewTreeCellProtocol?
     
     private lazy var tipImageView = {
        let img = UIImageView()
@@ -108,7 +107,7 @@ class TableViewTreeCell: UITableViewCell {
         }
     }
     
-    func setData(title: String?, avater: String?, showMore: TreeTipStatus = .close, level: Int = 0, showUnbind: Bool = false, delegate: TableViewTreeCellProtocol? = nil) {
+    func setData(title: String?, avater: String?, showMore: TreeTipStatus = .close, level: Int = 0, showUnbind: Bool = false, delegate: ZLTableViewTreeCellProtocol? = nil) {
         self.delegate = delegate
         if showMore == .show {
             tipImageView.image = UIImage(named: "vk_show_more")
@@ -135,8 +134,6 @@ class TableViewTreeCell: UITableViewCell {
         }
         
         titleLable.superview?.layoutIfNeeded()
-        let frame = titleLable.frame
-        let maxX = UIScreen.main.bounds.width - 36
         if level > 1 {
             self.addPanGesture()
         }
