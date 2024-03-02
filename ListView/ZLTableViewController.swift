@@ -22,13 +22,13 @@ class ZLTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return modelManager?.listModels.count ?? 0
+        return modelManager?.list.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(ZlTableViewTreeCell.self), for: indexPath) as! ZlTableViewTreeCell
         
-        let model = modelManager!.listModels[indexPath.row]
+        let model = modelManager!.list[indexPath.row]
         let level = Int(model.level) ?? 0
         cell.indentationLevel = level
     
@@ -50,11 +50,11 @@ class ZLTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let manager = modelManager {
-            let didSelectModel = manager.listModels[indexPath.row]
+            let didSelectModel = manager.list[indexPath.row]
             if didSelectModel.belowCount == 0 {
                 if let submodels = didSelectModel.openModel() {
                     tableView.reloadRows(at: [indexPath], with: .none)
-                    manager.listModels.insert(contentsOf: submodels, at: indexPath.row + 1)
+                    manager.list.insert(contentsOf: submodels, at: indexPath.row + 1)
                     var indexPaths: [IndexPath] = []
                     for (i, _) in submodels.enumerated() {
                         let insertIndexPath = IndexPath(row: indexPath.row + 1 + i , section: indexPath.section)
@@ -66,10 +66,10 @@ class ZLTableViewController: UITableViewController {
                 }
             } else {
                 let range = (indexPath.row + 1)..<(didSelectModel.belowCount+indexPath.row + 1)
-                let submodels = Array(manager.listModels[range])
+                let submodels = Array(manager.list[range])
                 didSelectModel.closeWithSubmodels(submodels)
                 tableView.reloadRows(at: [indexPath], with: .none)
-                manager.listModels.removeSubrange(range)
+                manager.list.removeSubrange(range)
                 var indexPaths: [IndexPath] = []
                 for (i, _) in submodels.enumerated() {
                     let insertIndexPath = IndexPath(row: indexPath.row + 1 + i , section: indexPath.section)

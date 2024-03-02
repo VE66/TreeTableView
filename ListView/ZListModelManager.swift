@@ -7,11 +7,214 @@
 
 import UIKit
 import HandyJSON
+
+protocol ZlistModelManagerProtocol: AnyObject {
+    func insertRow(at indexPath: IndexPath, with indexPaths: [IndexPath])
+    func deleteRow(at indexPath: IndexPath, with indexPaths: [IndexPath])
+}
+
 class ZListModelManager: NSObject {
-    var listModels: [ListModel] = []
+    var list: [ListModel] = []
+    
+    weak var deleagte: ZlistModelManagerProtocol?
+    
     init(listModels: [ListModel]) {
-        self.listModels = listModels
+        self.list = listModels
     }
+    
+    func getData(completion: @escaping ([ListModel])->Void) {
+        let data = [
+            [
+             "text":"河北省",
+             "level":"0",
+             "submodels":[
+                     [
+                         "text":"衡水市",
+                         "level":"1",
+                         "submodels":[
+                                 [
+                                     "text":"阜城县",
+                                     "level":"2",
+                                     "submodels":[
+                                             [
+                                                 "text":"大白乡",
+                                                 "level":"3",
+                                                 "submodels":[
+                                                         [
+                                                             "text":"衡水市",
+                                                             "level":"4",
+                                                             "submodels":[
+                                           [
+                                               "text":"阜城县",
+                                               "level":"5",
+                                               "submodels":[
+                                                       [
+                                                           "text":"大白乡",
+                                                           "level":"6",
+                                                           ],
+                                                       [
+                                                           "text":"建桥乡",
+                                                           "level":"6",
+                                                           ],
+                                                       [
+                                                           "text":"古城镇",
+                                                           "level":"6",
+                                                           ]
+                                                       ]
+                                               ],
+                                           [
+                                               "text":"武邑县",
+                                               "level":"5",
+                                               ],
+                                           [
+                                               "text":"景县",
+                                               "level":"5",
+                                               ]
+                                           ]
+                                                             ],
+                                                         [
+                                                             "text":"廊坊市",
+                                                             "level":"1",
+                                                             "submodels":[
+                                           [
+                                               "text":"固安县",
+                                               "level":"2",
+                                               ],
+                                           [
+                                               "text":"三河市",
+                                               "level":"2",
+                                               ],
+                                           [
+                                               "text":"霸州市",
+                                               "level":"2",
+                                               ]
+                                           ]
+                                                             ]
+                                                         ]
+                                                 ],
+                                             [
+                                                 "text":"建桥乡",
+                                                 "level":"3",
+                                                 ],
+                                             [
+                                                 "text":"古城镇",
+                                                 "level":"3",
+                                                 ]
+                                             ]
+                                     ],
+                                 [
+                                     "text":"武邑县",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"景县",
+                                     "level":"2",
+                                     ]
+                                 ]
+                         ],
+                     [
+                         "text":"廊坊市",
+                         "level":"1",
+                         "submodels":[
+                                 [
+                                     "text":"固安县",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"三河市",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"霸州市",
+                                     "level":"2",
+                                     ]
+                                 ]
+                         ]
+                     ]
+             ],
+            [
+             "text":"山东省",
+             "level":"0",
+             "submodels":[
+                     [
+                         "text":"德州市",
+                         "level":"1",
+                         "submodels":[
+                                 [
+                                     "text":"临邑县",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"齐河县",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"平原县",
+                                     "level":"2",
+                                     ]
+                                 ]
+                         ],
+                     [
+                         "text":"烟台市",
+                         "level":"1",
+                         "submodels":[
+                                 [
+                                     "text":"蓬莱市",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"招远市",
+                                     "level":"2",
+                                     ],
+                                 [
+                                     "text":"海阳市",
+                                     "level":"2",
+                                     ]
+                                 ]
+                         ]
+                     ]
+             ],
+          ]
+        
+        if let model = [ListModel].deserialize(from: data) as? [ListModel] {
+            self.list = model
+            completion(model)
+        } else {
+            self.list = []
+            completion([])
+        }
+    }
+    
+    
+    func clickItem(at indexPath: IndexPath) {
+        let didSelectModel = self.list[indexPath.row]
+        if didSelectModel.belowCount == 0 {
+            if let submodels = didSelectModel.openModel() {
+                self.list.insert(contentsOf: submodels, at: indexPath.row + 1)
+                var indexPaths: [IndexPath] = []
+                for i in 0..<submodels.count {
+                    let insertIndexPath = IndexPath(row: indexPath.row + 1 + i , section: indexPath.section)
+                    indexPaths.append(insertIndexPath)
+                }
+                deleagte?.insertRow(at: indexPath, with: indexPaths)
+            }
+        } else {
+            let range = (indexPath.row + 1)..<(didSelectModel.belowCount+indexPath.row + 1)
+            let submodels = Array(self.list[range])
+            didSelectModel.closeWithSubmodels(submodels)
+            self.list.removeSubrange(range)
+            var indexPaths: [IndexPath] = []
+            for i in 0..<submodels.count {
+                let insertIndexPath = IndexPath(row: indexPath.row + 1 + i , section: indexPath.section)
+                indexPaths.append(insertIndexPath)
+            }
+            deleagte?.deleteRow(at: indexPath, with: indexPaths)
+
+        }
+    }
+    
+    
+    
 }
 
 enum TreeTipStatus {
