@@ -10,7 +10,7 @@ import UIKit
 class ZLTreeView: UIView {
    weak var modelManager: ZListModelManager? {
         didSet {
-            modelManager?.deleagte = self
+            modelManager?.listChangedDeleagte = self
             self.tbView.reloadData()
         }
     }
@@ -40,6 +40,12 @@ class ZLTreeView: UIView {
         self.addSubview(tbView)
         tbView.snp.makeConstraints { make in
             make.edges.equalTo(self)
+        }
+    }
+    
+    func reloadData() {
+        DispatchQueue.main.async {
+            self.tbView.reloadData()
         }
     }
 
@@ -107,7 +113,7 @@ extension ZLTreeView: ZLTableViewTreeCellProtocol {
     
 }
 
-extension ZLTreeView: ZlistModelManagerProtocol {
+extension ZLTreeView: ZlTreeListChangedProtocol {
     func insertRow(at indexPath: IndexPath, with indexPaths: [IndexPath]) {
         self.tbView.performBatchUpdates {
             self.tbView.insertRows(at: indexPaths, with: .fade)

@@ -8,7 +8,11 @@
 import UIKit
 import HandyJSON
 
-protocol ZlistModelManagerProtocol: AnyObject {
+protocol ZListModelManagerDelegate: AnyObject {
+    
+}
+
+protocol ZlTreeListChangedProtocol: AnyObject {
     func insertRow(at indexPath: IndexPath, with indexPaths: [IndexPath])
     func deleteRow(at indexPath: IndexPath, with indexPaths: [IndexPath])
 }
@@ -16,11 +20,9 @@ protocol ZlistModelManagerProtocol: AnyObject {
 class ZListModelManager: NSObject {
     var list: [ListModel] = []
     
-    weak var deleagte: ZlistModelManagerProtocol?
-    
-    init(listModels: [ListModel]) {
-        self.list = listModels
-    }
+    weak var listChangedDeleagte: ZlTreeListChangedProtocol?
+    weak var deleagte: ZListModelManagerDelegate?
+
     
     func getData(completion: @escaping ([ListModel])->Void) {
         let data = [
@@ -196,7 +198,7 @@ class ZListModelManager: NSObject {
                     let insertIndexPath = IndexPath(row: indexPath.row + 1 + i , section: indexPath.section)
                     indexPaths.append(insertIndexPath)
                 }
-                deleagte?.insertRow(at: indexPath, with: indexPaths)
+                listChangedDeleagte?.insertRow(at: indexPath, with: indexPaths)
             }
         } else {
             let range = (indexPath.row + 1)..<(didSelectModel.belowCount+indexPath.row + 1)
@@ -208,7 +210,7 @@ class ZListModelManager: NSObject {
                 let insertIndexPath = IndexPath(row: indexPath.row + 1 + i , section: indexPath.section)
                 indexPaths.append(insertIndexPath)
             }
-            deleagte?.deleteRow(at: indexPath, with: indexPaths)
+            listChangedDeleagte?.deleteRow(at: indexPath, with: indexPaths)
 
         }
     }

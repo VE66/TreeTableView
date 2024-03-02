@@ -60,16 +60,8 @@ class ViewController: UIViewController {
     }
     
     func pushZLTableViewController() {
-        let path = Bundle.main.path(forResource: "model", ofType: "text") ?? ""
-        if let data = NSData(contentsOfFile: path) {
-            let dict = try? JSONSerialization.jsonObject(with: data as Data) as? [Any]
-            if let model = [ListModel].deserialize(from: dict) as? [ListModel] {
-                let mgr = ZListModelManager.init(listModels: model)
-                let vc = ZLTreeViewController()
-                vc.modelManager = mgr
-                self.navigationController?.pushViewController(vc, animated: true)
-            }
-        }
+        let vc = ZLTreeViewController()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     
