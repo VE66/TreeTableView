@@ -188,10 +188,10 @@ class ZListModelManager: NSObject {
     }
     
     
-    func clickItem(at indexPath: IndexPath) {
+    func clickItem(at indexPath: IndexPath, supperOffsetX: CGFloat? = nil) {
         let didSelectModel = self.list[indexPath.row]
         if didSelectModel.belowCount == 0 {
-            if let submodels = didSelectModel.openModel() {
+            if let submodels = didSelectModel.openModel(supperOffsetX) {
                 self.list.insert(contentsOf: submodels, at: indexPath.row + 1)
                 var indexPaths: [IndexPath] = []
                 for i in 0..<submodels.count {
@@ -232,6 +232,8 @@ class ListModel: HandyJSON {
     var text: String = ""
     var id: String = ""
     var level: String = "0"
+    var supperOffSetX: CGFloat?
+
     var belowCount: Int = 0 {
         didSet {
             self.supermodel?.belowCount += belowCount - oldValue
@@ -242,11 +244,13 @@ class ListModel: HandyJSON {
     
     var showMore: TreeTipStatus = .close
     
-    func openModel() -> [ListModel]? {
+    func openModel(_ supperOffSetX: CGFloat? = nil) -> [ListModel]? {
         guard var items = self.submodels, items.isEmpty == false else {
             return nil
         }
         self.showMore = .show
+        
+        let level: Int = Int(self.level) ?? 0
         
          items = items.map({ m in
             if m.level != "0" {
@@ -259,6 +263,17 @@ class ListModel: HandyJSON {
                      m.showMore = .none
                  }
              }
+             
+             let currentLevel = Int(m.level) ?? level + 1
+             if currentLevel == level + 1 {
+                 m.supperOffSetX = supperOffSetX
+             } else {
+                 if let supperOffSetX = supperOffSetX {
+                     // 子类2级要去除上一层----使用时自己父类所以要减一层
+                     m.supperOffSetX = 30 * CGFloat((currentLevel - level - 1)) + supperOffSetX
+                 }
+             }
+             
              return m
         })
         

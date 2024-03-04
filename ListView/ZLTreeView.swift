@@ -75,21 +75,42 @@ extension ZLTreeView: UITableViewDelegate, UITableViewDataSource {
         let level = Int(model.level) ?? 0
         cell.indentationLevel = level
     
-        cell.setData(title: model.text, avater: nil, showMore: model.showMore, level: level, showUnbind: true, delegate: self)
+        cell.setData(title: model.text, avater: nil, showMore: model.showMore, level: level, upViewOffSetX: model.supperOffSetX, showUnbind: true, delegate: self)
         return cell
     }
         
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        modelManager?.clickItem(at: indexPath)
+        var offSetX: CGFloat? = nil
+        if let cell = tableView.cellForRow(at: indexPath) as? ZlTableViewTreeCell {
+            offSetX = cell.getCurrentOffSetX()
+        }
+        modelManager?.clickItem(at: indexPath, supperOffsetX: offSetX)
     }
 
 }
 
 extension ZLTreeView: ZLTableViewTreeCellProtocol {
     func pancell(_ cell: UITableViewCell, oringX: CGFloat) {
-        if let indexPath = self.tbView.indexPath(for: cell), indexPath.row > 0 {
+        if let indexPath = self.tbView.indexPath(for: cell), indexPath.row > 0, let list = modelManager?.list {
+            // 向上遍历 --- 只加一个 leve 0
             for i in (0..<indexPath.row).reversed() {
-                if let model = modelManager?.list[i] {
+                let model = list[i]
+                let index = IndexPath(row: i, section: indexPath.section)
+                if let cell = tbView.cellForRow(at: index) as? ZlTableViewTreeCell {
+                    cell.horizontalMigration(oringX)
+                }
+                /// 避免进入其它层级-- 只做一次level 为0
+                if model.level == "0" {
+                    break
+                }
+                
+            }
+            
+            // 向下遍历
+            let nextIndexPath = indexPath.row + 1
+            if nextIndexPath < list.count {
+                for i in nextIndexPath..<(list.count) {
+                    let model = list[i]
                     if model.level != "0" {
                         let index = IndexPath(row: i, section: indexPath.section)
                         if let cell = tbView.cellForRow(at: index) as? ZlTableViewTreeCell {
@@ -118,13 +139,37 @@ extension ZLTreeView: ZlTreeListChangedProtocol {
         self.tbView.performBatchUpdates {
             self.tbView.insertRows(at: indexPaths, with: .fade)
         }
+        let index = indexPath.row - 1
+        let model = self.modelManager?.list[indexPath.row]
+        if index >= 0 {
+            let newIndexPath = IndexPath(row: index, section: 0)
+            model?.supperOffSetX = getUpLevelContentOffX(newIndexPath)
+        }
         // 更新角标
         self.tbView.reloadRows(at: [indexPath], with: .none)
+    }
+    
+    func getUpLevelContentOffX(_ indexPath: IndexPath) -> CGFloat? {
+        if let manager = modelManager {
+            if indexPath.row < manager.list.count{
+                if let cell = self.tbView.cellForRow(at: indexPath) as? ZlTableViewTreeCell {
+                    return cell.getCurrentOffSetX()
+                }
+            }
+        }
+        return nil
     }
     
     func deleteRow(at indexPath: IndexPath, with indexPaths: [IndexPath]) {
         self.tbView.performBatchUpdates {
             self.tbView.deleteRows(at: indexPaths, with: .fade)
+        }
+        
+        let index = indexPath.row - 1
+        let model = self.modelManager?.list[indexPath.row]
+        if index >= 0 {
+            let newIndexPath = IndexPath(row: index, section: 0)
+            model?.supperOffSetX = getUpLevelContentOffX(newIndexPath)
         }
         // 更新角标
         self.tbView.reloadRows(at: [indexPath], with: .none)

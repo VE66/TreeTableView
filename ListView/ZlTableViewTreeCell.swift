@@ -56,7 +56,7 @@ class ZlTableViewTreeCell: UITableViewCell {
     
     private lazy var pan: UIPanGestureRecognizer = {
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizer(_:)))
-        
+        pan.delegate = self
         return pan
     }()
     
@@ -107,7 +107,7 @@ class ZlTableViewTreeCell: UITableViewCell {
         }
     }
     
-    func setData(title: String?, avater: String?, showMore: TreeTipStatus = .close, level: Int = 0, showUnbind: Bool = false, delegate: ZLTableViewTreeCellProtocol? = nil) {
+    func setData(title: String?, avater: String?, showMore: TreeTipStatus = .close, level: Int = 0, upViewOffSetX: CGFloat? = nil, showUnbind: Bool = false, delegate: ZLTableViewTreeCellProtocol? = nil) {
         self.delegate = delegate
         if showMore == .show {
             tipImageView.image = UIImage(named: "vk_show_more")
@@ -127,10 +127,13 @@ class ZlTableViewTreeCell: UITableViewCell {
         let title = title ?? ""
         titleLable.text = title + title + title + title
         
-        let leftMargin: CGFloat = CGFloat(30 * indentationLevel)
-        tipImageMaxX = leftMargin + 12
+        var leftMargin: CGFloat = CGFloat(30 * indentationLevel) + 12
+        tipImageMaxX = leftMargin
+        if let upViewOffSetX = upViewOffSetX {
+            leftMargin = upViewOffSetX + 30
+        }
         tipImageView.snp.updateConstraints { make in
-            make.left.equalTo(leftMargin + 12)
+            make.left.equalTo(leftMargin)
         }
         
         titleLable.superview?.layoutIfNeeded()
@@ -164,9 +167,6 @@ class ZlTableViewTreeCell: UITableViewCell {
     
     func horizontalMigration(_ orgx: CGFloat) {
         var x = tipImageView.frame.minX + orgx
-        if x < 12 {
-            x = 12
-        }
         if x > tipImageMaxX {
             x = tipImageMaxX
         }
@@ -174,6 +174,11 @@ class ZlTableViewTreeCell: UITableViewCell {
             make.left.equalTo(x)
         }
         tipImageView.superview?.layoutIfNeeded()
+    }
+    
+    func getCurrentOffSetX() -> CGFloat? {
+        tipImageView.superview?.layoutIfNeeded()
+        return tipImageView.frame.origin.x
     }
     
     @objc func unbindAction(_ sender: UIButton) {
@@ -195,4 +200,17 @@ class ZlTableViewTreeCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
+}
+
+extension ZlTableViewTreeCell {
+    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        let view = gestureRecognizer.view
+        if let pan = gestureRecognizer as? UIPanGestureRecognizer {
+            let offSet = pan.translation(in: view)
+            if offSet.y <= offSet.x {
+                return false
+            }
+        }
+        return true
+    }
 }
