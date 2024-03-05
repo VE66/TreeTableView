@@ -9,6 +9,7 @@ import UIKit
 
 protocol ZLTableViewTreeCellProtocol: AnyObject {
     func pancell(_ cell: UITableViewCell, oringX: CGFloat)
+    func endPanCell(_ cell: UITableViewCell)
     func unbindAction(_ cell: UITableViewCell)
 }
 
@@ -36,6 +37,9 @@ class ZlTableViewTreeCell: UITableViewCell {
     private var tipImageMaxX: CGFloat = 0
     private var tipImageMinX: CGFloat = 0
 
+    private var canShowScrollIndicator: Bool = false
+
+    
     private lazy var avaterView = {
         let img = UIImageView()
          img.contentMode = .scaleAspectFit
@@ -71,6 +75,14 @@ class ZlTableViewTreeCell: UITableViewCell {
         return pan
     }()
     
+    private lazy var scrollIndicator: UIImageView = {
+        let img = UIImageView()
+         img.contentMode = .scaleAspectFit
+        img.backgroundColor = UIColor(hex: "#D8D8D8")
+        img.layer.cornerRadius = 7/2.0
+        img.isHidden = true
+        return img
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -84,6 +96,7 @@ class ZlTableViewTreeCell: UITableViewCell {
         self.contentView.addSubview(titleLable)
         self.addSubview(unbindView)
         self.addSubview(separatorLine)
+        self.addSubview(scrollIndicator)
 
         tipImageView.snp.makeConstraints { make in
             make.left.equalTo(Self.leftMargin)
@@ -116,6 +129,15 @@ class ZlTableViewTreeCell: UITableViewCell {
             make.right.equalTo(-16)
             make.height.equalTo(0.5)
         }
+        
+        scrollIndicator.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.left.equalTo(0)
+            make.right.lessThanOrEqualToSuperview()
+            make.height.equalTo(7)
+            make.width.equalTo(50)
+        }
+        print("scrollIndicator 1 = 50")
     }
     
     func setData(model: ListModel, showUnbind: Bool = false, delegate: ZLTableViewTreeCellProtocol? = nil) {
@@ -176,12 +198,61 @@ class ZlTableViewTreeCell: UITableViewCell {
             self.horizontalMigration(x)
             delegate?.pancell(self, oringX: x)
             self.lastPanX = panX
+        case .ended:
+            self.endPan()
+            delegate?.endPanCell(self)
         default:
             self.lastPanX = 0
         }
     }
     
+    func endPan() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.scrollIndicator.isHidden = true
+        }
+    }
+    
     func horizontalMigration(_ orgx: CGFloat) {
+        let scrollIndicatorX = scrollIndicator.frame.minX
+        let x = handlePanOriginX(orgx)
+        tipImageView.snp.updateConstraints { make in
+            make.left.equalTo(x)
+        }
+        let minOffX = currentModel?.srcollSpace ?? 0
+        if minOffX != 0 {
+            var value: CGFloat = (x - tipImageMaxX + minOffX) * (self.bounds.width - scrollIndicator.frame.width)/minOffX
+            if value < 0 {
+                value = 0
+            }
+            if scrollIndicator.superview != nil {
+                var width = self.bounds.width - minOffX
+                if width < 50 {
+                    width = 50
+                }
+                
+                if width > 200 {
+                    width = 200
+                }
+                
+                if scrollIndicatorX != value, self.canShowScrollIndicator {
+                    self.scrollIndicator.isHidden = false
+                }
+                
+                scrollIndicator.snp.remakeConstraints { make in
+                    make.left.equalTo(value)
+                    make.bottom.equalToSuperview()
+                    make.right.lessThanOrEqualToSuperview()
+                    make.height.equalTo(7)
+                    make.width.equalTo(width)
+                }
+            }
+        } else {
+            scrollIndicator.isHidden = true
+        }
+        tipImageView.superview?.layoutIfNeeded()
+    }
+    
+    private func handlePanOriginX(_ orgx: CGFloat) -> CGFloat {
         var x = tipImageView.frame.minX + orgx
         let minOffX = currentModel?.srcollSpace ?? 0
         
@@ -192,10 +263,11 @@ class ZlTableViewTreeCell: UITableViewCell {
         if x > tipImageMaxX {
             x = tipImageMaxX
         }
-        tipImageView.snp.updateConstraints { make in
-            make.left.equalTo(x)
-        }
-        tipImageView.superview?.layoutIfNeeded()
+        return x
+    }
+    
+    func showScrollIndicator(show: Bool, oringX: CGFloat = 0) {
+        self.canShowScrollIndicator = show
     }
     
     func getCurrentOffSetX() -> CGFloat? {

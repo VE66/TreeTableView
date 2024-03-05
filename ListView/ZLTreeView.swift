@@ -90,8 +90,32 @@ extension ZLTreeView: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension ZLTreeView: ZLTableViewTreeCellProtocol {
+    func endPanCell(_ cell: UITableViewCell) {
+
+        if let indexPath = self.tbView.indexPath(for: cell), indexPath.row > 0, let list = modelManager?.list {
+            
+            let nextIndexPath = indexPath.row + 1
+            if nextIndexPath < list.count {
+                for i in nextIndexPath..<(list.count) {
+                    let model = list[i]
+                    if model.level != 0 {
+                        let index = IndexPath(row: i, section: indexPath.section)
+                        if let cell = tbView.cellForRow(at: index) as? ZlTableViewTreeCell {
+                            cell.endPan()
+                        }
+                    } else {
+                        /// 避免进入其它层级--
+                        break
+                    }
+                }
+            }
+        }
+        
+    }
+    
     func pancell(_ cell: UITableViewCell, oringX: CGFloat) {
         if let indexPath = self.tbView.indexPath(for: cell), indexPath.row > 0, let list = modelManager?.list {
+            var lastCell: ZlTableViewTreeCell? = cell as? ZlTableViewTreeCell
             // 向上遍历 --- 只加一个 leve 0
             for i in (0..<indexPath.row).reversed() {
                 let model = list[i]
@@ -115,6 +139,7 @@ extension ZLTreeView: ZLTableViewTreeCellProtocol {
                         let index = IndexPath(row: i, section: indexPath.section)
                         if let cell = tbView.cellForRow(at: index) as? ZlTableViewTreeCell {
                             cell.horizontalMigration(oringX)
+                            lastCell = cell
                         }
                     } else {
                         /// 避免进入其它层级--
@@ -123,6 +148,9 @@ extension ZLTreeView: ZLTableViewTreeCellProtocol {
                 }
             }
             
+            if let lastCell = lastCell {
+                lastCell.showScrollIndicator(show: true, oringX: oringX)
+            }
         }
     }
     

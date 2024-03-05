@@ -11,6 +11,8 @@
 		3D8686A82B8DE1FA00C28048 /* ZListModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8686A72B8DE1FA00C28048 /* ZListModelManager.swift */; };
 		3D8686AA2B8DE38000C28048 /* model.text in Resources */ = {isa = PBXBuildFile; fileRef = 3D8686A92B8DE38000C28048 /* model.text */; };
 		3D8686AC2B8EC6CD00C28048 /* ZLTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8686AB2B8EC6CD00C28048 /* ZLTableViewController.swift */; };
+		3DBEF40C2B9706C800791F84 /* UIColor+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBEF40B2B9706C800791F84 /* UIColor+Ex.swift */; };
+		3DBEF40E2B970CF300791F84 /* String+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBEF40D2B970CF300791F84 /* String+Ex.swift */; };
 		3DC5B0312B9073540033C9DA /* ZLTreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DC5B0302B9073540033C9DA /* ZLTreeViewController.swift */; };
 		3DD756592B43FE8900C816DA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD756582B43FE8900C816DA /* AppDelegate.swift */; };
 		3DD7565B2B43FE8900C816DA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DD7565A2B43FE8900C816DA /* SceneDelegate.swift */; };
@@ -28,6 +30,8 @@
 		3D8686A72B8DE1FA00C28048 /* ZListModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZListModelManager.swift; sourceTree = "<group>"; };
 		3D8686A92B8DE38000C28048 /* model.text */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = model.text; sourceTree = "<group>"; };
 		3D8686AB2B8EC6CD00C28048 /* ZLTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZLTableViewController.swift; sourceTree = "<group>"; };
+		3DBEF40B2B9706C800791F84 /* UIColor+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ex.swift"; sourceTree = "<group>"; };
+		3DBEF40D2B970CF300791F84 /* String+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ex.swift"; sourceTree = "<group>"; };
 		3DC5B0302B9073540033C9DA /* ZLTreeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZLTreeViewController.swift; sourceTree = "<group>"; };
 		3DD756552B43FE8900C816DA /* ListView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ListView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DD756582B43FE8900C816DA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -83,6 +87,8 @@
 				3DC5B0302B9073540033C9DA /* ZLTreeViewController.swift */,
 				3D2D8CF82B91B28F0028BE07 /* ZLTreeView.swift */,
 				3DDDD4362B905818008BA391 /* ZlTableViewTreeCell.swift */,
+				3DBEF40B2B9706C800791F84 /* UIColor+Ex.swift */,
+				3DBEF40D2B970CF300791F84 /* String+Ex.swift */,
 				3D8686A92B8DE38000C28048 /* model.text */,
 				3DD7565E2B43FE8900C816DA /* Main.storyboard */,
 				3DD756612B43FE8B00C816DA /* Assets.xcassets */,
@@ -226,11 +232,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DC5B0312B9073540033C9DA /* ZLTreeViewController.swift in Sources */,
+				3DBEF40E2B970CF300791F84 /* String+Ex.swift in Sources */,
 				3D8686A82B8DE1FA00C28048 /* ZListModelManager.swift in Sources */,
 				3DD7565D2B43FE8900C816DA /* ViewController.swift in Sources */,
 				3DD756592B43FE8900C816DA /* AppDelegate.swift in Sources */,
 				3D2D8CF92B91B28F0028BE07 /* ZLTreeView.swift in Sources */,
 				3DDDD4372B905818008BA391 /* ZlTableViewTreeCell.swift in Sources */,
+				3DBEF40C2B9706C800791F84 /* UIColor+Ex.swift in Sources */,
 				3D8686AC2B8EC6CD00C28048 /* ZLTableViewController.swift in Sources */,
 				3DD7565B2B43FE8900C816DA /* SceneDelegate.swift in Sources */,
 			);
