@@ -29,10 +29,10 @@ class ZLTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(ZlTableViewTreeCell.self), for: indexPath) as! ZlTableViewTreeCell
         
         let model = modelManager!.list[indexPath.row]
-        let level = Int(model.level) ?? 0
+        let level = model.level
         cell.indentationLevel = level
     
-        cell.setData(title: model.text, avater: nil, showMore: model.showMore, level: level, showUnbind: true)
+        cell.setData(model: model, showUnbind: true)
         return cell
     }
     

@@ -8,6 +8,7 @@
 import UIKit
 
 class ZLTreeView: UIView {
+        
    weak var modelManager: ZListModelManager? {
         didSet {
             modelManager?.listChangedDeleagte = self
@@ -72,10 +73,7 @@ extension ZLTreeView: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(ZlTableViewTreeCell.self), for: indexPath) as! ZlTableViewTreeCell
         
         let model = modelManager!.list[indexPath.row]
-        let level = Int(model.level) ?? 0
-        cell.indentationLevel = level
-    
-        cell.setData(title: model.text, avater: nil, showMore: model.showMore, level: level, upViewOffSetX: model.supperOffSetX, showUnbind: true, delegate: self)
+        cell.setData(model: model, showUnbind: true, delegate: self)
         return cell
     }
         
@@ -86,6 +84,8 @@ extension ZLTreeView: UITableViewDelegate, UITableViewDataSource {
         }
         modelManager?.clickItem(at: indexPath, supperOffsetX: offSetX)
     }
+    
+ 
 
 }
 
@@ -100,7 +100,7 @@ extension ZLTreeView: ZLTableViewTreeCellProtocol {
                     cell.horizontalMigration(oringX)
                 }
                 /// 避免进入其它层级-- 只做一次level 为0
-                if model.level == "0" {
+                if model.level == 0 {
                     break
                 }
                 
@@ -111,7 +111,7 @@ extension ZLTreeView: ZLTableViewTreeCellProtocol {
             if nextIndexPath < list.count {
                 for i in nextIndexPath..<(list.count) {
                     let model = list[i]
-                    if model.level != "0" {
+                    if model.level != 0 {
                         let index = IndexPath(row: i, section: indexPath.section)
                         if let cell = tbView.cellForRow(at: index) as? ZlTableViewTreeCell {
                             cell.horizontalMigration(oringX)
@@ -143,17 +143,22 @@ extension ZLTreeView: ZlTreeListChangedProtocol {
         let model = self.modelManager?.list[indexPath.row]
         if index >= 0 {
             let newIndexPath = IndexPath(row: index, section: 0)
-            model?.supperOffSetX = getUpLevelContentOffX(newIndexPath)
+            model?.supperOffSetX = getUpLevelContentOffX(newIndexPath, with: model?.level ?? 0)
         }
         // 更新角标
         self.tbView.reloadRows(at: [indexPath], with: .none)
     }
     
-    func getUpLevelContentOffX(_ indexPath: IndexPath) -> CGFloat? {
+    func getUpLevelContentOffX(_ indexPath: IndexPath, with level: Int) -> CGFloat? {
         if let manager = modelManager {
             if indexPath.row < manager.list.count{
-                if let cell = self.tbView.cellForRow(at: indexPath) as? ZlTableViewTreeCell {
-                    return cell.getCurrentOffSetX()
+                for i in (0...indexPath.row).reversed() {
+                    let model = manager.list[i]
+                    let curretLevel = model.level
+                    if curretLevel == level - 1, let cell = self.tbView.cellForRow(at: IndexPath(row: i, section: 0)) as? ZlTableViewTreeCell {
+                        return cell.getCurrentOffSetX()
+                    }
+
                 }
             }
         }
@@ -169,7 +174,7 @@ extension ZLTreeView: ZlTreeListChangedProtocol {
         let model = self.modelManager?.list[indexPath.row]
         if index >= 0 {
             let newIndexPath = IndexPath(row: index, section: 0)
-            model?.supperOffSetX = getUpLevelContentOffX(newIndexPath)
+            model?.supperOffSetX = getUpLevelContentOffX(newIndexPath, with: model?.level ?? 0)
         }
         // 更新角标
         self.tbView.reloadRows(at: [indexPath], with: .none)

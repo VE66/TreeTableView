@@ -76,19 +76,19 @@ class ZListModelManager: NSObject {
                                                              ],
                                                          [
                                                              "text":"廊坊市",
-                                                             "level":"1",
+                                                             "level":"4",
                                                              "submodels":[
                                            [
                                                "text":"固安县",
-                                               "level":"2",
+                                               "level":"5",
                                                ],
                                            [
                                                "text":"三河市",
-                                               "level":"2",
+                                               "level":"5",
                                                ],
                                            [
                                                "text":"霸州市",
-                                               "level":"2",
+                                               "level":"5",
                                                ]
                                            ]
                                                              ]
@@ -199,11 +199,13 @@ class ZListModelManager: NSObject {
                     indexPaths.append(insertIndexPath)
                 }
                 listChangedDeleagte?.insertRow(at: indexPath, with: indexPaths)
+                handleScrollSpace(at: indexPath)
             }
         } else {
-            let range = (indexPath.row + 1)..<(didSelectModel.belowCount+indexPath.row + 1)
-            let submodels = Array(self.list[range])
+            let submodels = getCloseItems(at: indexPath)
             didSelectModel.closeWithSubmodels(submodels)
+            let range = (indexPath.row + 1)..<(submodels.count + indexPath.row + 1)
+
             self.list.removeSubrange(range)
             var indexPaths: [IndexPath] = []
             for i in 0..<submodels.count {
@@ -211,10 +213,72 @@ class ZListModelManager: NSObject {
                 indexPaths.append(insertIndexPath)
             }
             listChangedDeleagte?.deleteRow(at: indexPath, with: indexPaths)
-
+            handleScrollSpace(at: indexPath)
         }
     }
     
+    func handleScrollSpace(at indexPath: IndexPath) {
+        /// 获取该区间最大滑动区间
+        // 向上遍历 --- 只加一个 leve 0
+        var space: CGFloat = 0
+        var setItems: [ListModel] = []
+        for i in (0...indexPath.row).reversed() {
+            let model = list[i]
+            let currentOffsetX = ZlTableViewTreeCell.getMinX(title: model.text, level: model.level)
+            // 设置值
+            if currentOffsetX > space {
+                space = currentOffsetX
+            }
+            setItems.append(model)
+            /// 避免进入其它层级-- 只做一次level 为0
+            if model.level == 0 {
+                break
+            }
+            
+        }
+        
+        // 向下遍历
+        let nextIndexPath = indexPath.row + 1
+        if nextIndexPath < list.count {
+            for i in nextIndexPath..<(list.count) {
+                let model = list[i]
+                if model.level != 0 {
+                    let currentOffsetX = ZlTableViewTreeCell.getMinX(title: model.text, level: model.level)
+                    // 设置值
+                    if currentOffsetX > space {
+                        space = currentOffsetX
+                    }
+                    setItems.append(model)
+                } else {
+                    /// 避免进入其它层级--
+                    break
+                }
+            }
+        }
+        
+        for item in setItems {
+            item.srcollSpace = space
+        }
+    }
+    
+    func getCloseItems(at indexPath: IndexPath) -> [ListModel] {
+        var closeItems: [ListModel] = []
+        let currentModel = self.list[indexPath.row]
+        
+        // 向下遍历
+        let nextIndexPath = indexPath.row + 1
+        if nextIndexPath < list.count {
+            for i in nextIndexPath..<(list.count) {
+                let model = list[i]
+                if model.level > currentModel.level {
+                    closeItems.append(model)
+                } else {
+                    break
+                }
+            }
+        }
+        return closeItems
+    }
     
     
 }
@@ -231,8 +295,10 @@ class ListModel: HandyJSON {
  
     var text: String = ""
     var id: String = ""
-    var level: String = "0"
-    var supperOffSetX: CGFloat?
+    var level: Int = 0
+    var supperOffSetX: CGFloat? //
+    
+    var srcollSpace: CGFloat = 0 // 滑动区间大小
 
     var belowCount: Int = 0 {
         didSet {
@@ -253,7 +319,7 @@ class ListModel: HandyJSON {
         let level: Int = Int(self.level) ?? 0
         
          items = items.map({ m in
-            if m.level != "0" {
+            if m.level != 0 {
                 m.supermodel = self
             }
              if let submodels = m.submodels, submodels.isEmpty == false {
@@ -264,16 +330,16 @@ class ListModel: HandyJSON {
                  }
              }
              
-             let currentLevel = Int(m.level) ?? level + 1
+             let currentLevel = m.level
              if currentLevel == level + 1 {
                  m.supperOffSetX = supperOffSetX
              } else {
                  if let supperOffSetX = supperOffSetX {
                      // 子类2级要去除上一层----使用时自己父类所以要减一层
-                     m.supperOffSetX = 30 * CGFloat((currentLevel - level - 1)) + supperOffSetX
+                     m.supperOffSetX = ZlTableViewTreeCell.indentSize * CGFloat((currentLevel - level - 1)) + supperOffSetX
                  }
              }
-             
+                  
              return m
         })
         
@@ -281,6 +347,8 @@ class ListModel: HandyJSON {
         self.belowCount = items.count
         return items
     }
+    
+    
     
     func closeWithSubmodels(_ submodels: [ListModel]) {
         self.submodels = submodels

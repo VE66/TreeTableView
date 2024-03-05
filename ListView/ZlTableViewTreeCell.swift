@@ -14,6 +14,15 @@ protocol ZLTableViewTreeCellProtocol: AnyObject {
 
 class ZlTableViewTreeCell: UITableViewCell {
     
+    static let indentSize: CGFloat = 30
+    static let leftMargin: CGFloat = 12
+    static let tipImageSize: CGSize = CGSize(width: 16, height: 16)
+    static let avaterViewSize: CGSize = CGSize(width: 24, height: 24)
+    static let viewSpaceMargin: CGFloat = 8
+    static let titleRightMargin: CGFloat = -40
+
+    weak var currentModel: ListModel?
+    
     weak var delegate: ZLTableViewTreeCellProtocol?
     
     private lazy var tipImageView = {
@@ -25,6 +34,8 @@ class ZlTableViewTreeCell: UITableViewCell {
     
     private var lastPanX: CGFloat = 0
     private var tipImageMaxX: CGFloat = 0
+    private var tipImageMinX: CGFloat = 0
+
     private lazy var avaterView = {
         let img = UIImageView()
          img.contentMode = .scaleAspectFit
@@ -36,7 +47,7 @@ class ZlTableViewTreeCell: UITableViewCell {
     private lazy var titleLable = {
       let lab = UILabel()
         lab.font = UIFont.systemFont(ofSize: 16)
-        
+        lab.lineBreakMode = .byClipping
         return lab
     }()
     
@@ -75,21 +86,21 @@ class ZlTableViewTreeCell: UITableViewCell {
         self.addSubview(separatorLine)
 
         tipImageView.snp.makeConstraints { make in
-            make.left.equalTo(12)
-            make.size.equalTo(CGSize(width: 16, height: 16))
+            make.left.equalTo(Self.leftMargin)
+            make.size.equalTo(Self.tipImageSize)
         }
         
         avaterView.snp.makeConstraints { make in
             make.top.equalTo(12)
             make.centerY.equalTo(tipImageView)
-            make.size.equalTo(CGSize(width: 24, height: 24))
-            make.left.equalTo(tipImageView.snp.right).offset(8)
+            make.size.equalTo(Self.avaterViewSize)
+            make.left.equalTo(tipImageView.snp.right).offset(Self.viewSpaceMargin)
         }
         
         titleLable.snp.makeConstraints { make in
-            make.left.equalTo(avaterView.snp.right).offset(8)
+            make.left.equalTo(avaterView.snp.right).offset(Self.viewSpaceMargin)
             make.top.equalTo(12)
-            make.right.equalToSuperview().offset(-40)
+            make.right.equalToSuperview().offset(Self.titleRightMargin)
             make.bottom.equalTo(-12)
         }
         
@@ -107,8 +118,10 @@ class ZlTableViewTreeCell: UITableViewCell {
         }
     }
     
-    func setData(title: String?, avater: String?, showMore: TreeTipStatus = .close, level: Int = 0, upViewOffSetX: CGFloat? = nil, showUnbind: Bool = false, delegate: ZLTableViewTreeCellProtocol? = nil) {
+    func setData(model: ListModel, showUnbind: Bool = false, delegate: ZLTableViewTreeCellProtocol? = nil) {
+        currentModel = model
         self.delegate = delegate
+        let showMore = model.showMore
         if showMore == .show {
             tipImageView.image = UIImage(named: "vk_show_more")
             tipImageView.isHidden = false
@@ -124,13 +137,16 @@ class ZlTableViewTreeCell: UITableViewCell {
         } else {
             unbindView.isHidden = true
         }
-        let title = title ?? ""
+        let title = model.text
         titleLable.text = title + title + title + title
         
-        var leftMargin: CGFloat = CGFloat(30 * indentationLevel) + 12
+        let level: Int = model.level
+        var leftMargin: CGFloat = Self.indentSize * CGFloat(level) + 12
         tipImageMaxX = leftMargin
-        if let upViewOffSetX = upViewOffSetX {
-            leftMargin = upViewOffSetX + 30
+//        tipImageMinX = leftMargin
+        
+        if let upViewOffSetX = model.supperOffSetX {
+            leftMargin = upViewOffSetX + Self.indentSize
         }
         tipImageView.snp.updateConstraints { make in
             make.left.equalTo(leftMargin)
@@ -167,6 +183,12 @@ class ZlTableViewTreeCell: UITableViewCell {
     
     func horizontalMigration(_ orgx: CGFloat) {
         var x = tipImageView.frame.minX + orgx
+        let minOffX = currentModel?.srcollSpace ?? 0
+        
+        if x < tipImageMaxX - minOffX, orgx < 0 {
+            x = tipImageMaxX - minOffX
+        }
+        
         if x > tipImageMaxX {
             x = tipImageMaxX
         }
@@ -199,6 +221,22 @@ class ZlTableViewTreeCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
+    
+    static func getMinX(title: String, level: Int) -> CGFloat {
+        var maxX: CGFloat = self.leftMargin + self.tipImageSize.width + self.viewSpaceMargin + self.avaterViewSize.width + self.viewSpaceMargin + CGFloat(level) * self.indentSize
+        
+        let lab = UILabel()
+        lab.font = UIFont.systemFont(ofSize: 16)
+        lab.text = title + title + title + title
+        lab.sizeToFit()
+        maxX = maxX + lab.frame.width
+        let offSetX = abs(Self.titleRightMargin) + maxX - UIScreen.main.bounds.width
+        if offSetX <= 0 {
+            return 0
+        } else {
+            return offSetX
+        }
+    }
 
 }
 
@@ -208,6 +246,9 @@ extension ZlTableViewTreeCell {
         if let pan = gestureRecognizer as? UIPanGestureRecognizer {
             let offSet = pan.translation(in: view)
             if offSet.y <= offSet.x {
+                if pan == self.pan {
+                    return true
+                }
                 return false
             }
         }
