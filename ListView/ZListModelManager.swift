@@ -316,7 +316,7 @@ class ListModel: HandyJSON {
         }
         self.showMore = .show
         
-        let level: Int = Int(self.level) ?? 0
+        let level: Int = self.level
         
          items = items.map({ m in
             if m.level != 0 {
